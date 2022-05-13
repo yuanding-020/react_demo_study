@@ -1,15 +1,18 @@
 import React, { Component } from 'react'
 import axios from 'axios'
+import PubSub from 'pubsub-js'
 
 export default class Search extends Component {
   search = () =>{
     const {keywordElement:{value:keyword}} = this
+    console.log(keyword)
+    PubSub.publish('userDate',{isFirst:false,isLoading:true})
     axios.get(`/api1/search/users?q=${keyword}`).then(
       response=>{
         const res  = response.data.items
-        this.props.setDate(res)
+        PubSub.publish('userDate',{users:res,isLoading:false,})        
       },
-      err=>{console.log(err)}
+      err=>{PubSub.publish('userDate',{err:err.message,isLoading:false,})  }
     )
   }
   render() {
